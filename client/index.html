@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dvChat</title>
+    
+    <!-- con esta linea importamos el socket de la red y lo ejecutamos para que el cliente escuche el evento-->
+    <script type="module">
+        import {io} from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
+        const socket = io()
+
+
+        const form = document.getElementById('formulario')
+        const input =document.getElementById('mensaje')
+        const message = document.getElementById('message')
+
+        
+        //aca resive el evento que envia el otro servidor
+        socket.on('chat message',(msg) => {
+            const item = `<li>${msg}</li>`
+            message.insertAdjacentHTML('beforeend',item)
+        })
+
+        //le decimos que cuando se escuche el evento de submit ejecute algo
+        form.addEventListener('submit' ,(e) => {
+
+            //le quitamos su conportamineto por defecto
+            e.preventDefault()
+
+            if(input.value){
+                /**
+                 * si hay value en el input que emita un evento y le mande el valor al servidor
+                */
+                socket.emit('chat message',input.value)
+                input.value = ''
+            }
+        })
+    </script>
+    <style>
+        *{
+            padding: 0px;
+            margin: 0px;
+            box-sizing: border-box;
+            text-decoration: none;
+            list-style: none;
+        }
+        #message > li:nth-child(odd){
+            background-color: rgb(32, 31, 31);
+            color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body>
+    <section>
+        <ul id="message">
+
+        </ul>
+        <form id="formulario">
+            <input type="text" id="mensaje" name="mensaje" placeholder="ingresa tu mensaje..." autocomplete="off">
+            <button type="submit" name="send">enviar</button>
+        </form>
+    </section>
+</body>
+</html>
